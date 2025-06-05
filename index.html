@@ -3,25 +3,408 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Page</title>
+    <title>Candidate Test Structure</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
     <style>
+        :root {
+            --theme-color-primary: #F06C00; 
+            --theme-color-primary-dark: #D86000;
+            --theme-color-secondary: #005A70; 
+            --theme-color-accent: #00A0A8; 
+        }
+
         body {
-            font-family: sans-serif;
+            font-family: 'Inter', sans-serif;
+        }
+        .main-container {
+            max-width: 850px; 
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .section-container, .chart-container-wrapper {
+            width: 100%;
+            margin-bottom: 20px; 
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background-color: #fdfdff;
+        }
+        .section-title, .chart-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #2d3748; 
+        }
+        .header-main-title {
+             color: var(--theme-color-primary);
+        }
+        .query-block h3 {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 10px;
+            margin-top: 20px;
+        }
+         .query-block p {
+            margin-bottom: 8px;
+         }
+        table { /* This style might be unused now if all tables are removed */
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td { /* This style might be unused now */
+            border: 1px solid #cbd5e0;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top; 
+        }
+        th { /* This style might be unused now */
+            background-color: #edf2f7;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        svg {
+            display: block;
+            margin: 0 auto;
+            background-color: #f8fafc;
+            border-radius: 4px;
+        }
+        .axis-label { font-size: 0.8em; fill: #4a5568; }
+        .tick text { font-size: 0.75em; fill: #4a5568; }
+        
+        .bar { fill: var(--theme-color-primary); }
+        .bar:hover { fill: var(--theme-color-primary-dark); }
+        .line { fill: none; stroke: var(--theme-color-secondary); stroke-width: 2px; }
+        .dot { fill: var(--theme-color-secondary); stroke: #fff; }
+        .scatter-dot { fill: var(--theme-color-accent); opacity: 0.7; }
+        .scatter-dot:hover { fill: #007f86; opacity: 1;}
+
+        .tooltip {
+            position: absolute; text-align: center; padding: 8px; font: 12px sans-serif;
+            background: lightsteelblue; border: 0px; border-radius: 8px; pointer-events: none; opacity: 0;
+        }
+        pre[class*="language-"] {
+            background-color: #f3f4f6; 
+            border: 1px solid #e5e7eb; 
+            border-radius: 6px;
+            padding: 1em; 
+            overflow-x: auto; 
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em; 
+            line-height: 1.4;
+            color: #1f2937; 
+            text-align: left; 
+        }
+        code[class*="language-"] {
+            font-family: 'Courier New', Courier, monospace; 
+            background: none; 
+            color: inherit; 
+            font-size: inherit; 
+        }
+        .table-caption { /* This style might be unused now */
+            font-size: 0.9em;
+            font-style: italic;
+            color: #6b7280; 
+            margin-top: 5px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .test-page {
+            display: none; 
+        }
+        .navigation-buttons {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .nav-button {
+            background-color: var(--theme-color-primary); 
+            color: white;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .nav-button:hover {
+            background-color: var(--theme-color-primary-dark); 
+        }
+        .nav-button:disabled {
+            background-color: #9ca3af; 
+            cursor: not-allowed;
+        }
+        .sample-data-header { 
+            font-size: 1.1em; 
+            font-weight: 600;
+            color: #374151; 
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+        .footer-banner { /* This style might be unused if logo is removed */
+            width: 100%;
+            max-width: 200px; 
+            height: auto;
+            max-height: 40px; 
+            display: block;
+            margin: 10px auto 0; 
+        }
+         .data-placeholder-text {
+            color: #9ca3af; /* Tailwind gray-400 */
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+            border: 2px dashed #d1d5db; /* Tailwind gray-300 */
+            border-radius: 6px;
+            min-height: 100px;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-            color: #333;
         }
-        h1 {
-            font-size: 2em;
+
+
+        @media print {
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; margin: 0; padding: 0; }
+            .section-container, .chart-container-wrapper { border: 1px solid #ccc; box-shadow: none; margin-top: 0; margin-bottom: 20px; page-break-inside: avoid;}
+            .test-page { display: block !important; page-break-before: auto; page-break-after: auto; } 
+            #page-1, #page-2, #page-3, #page-4, #page-5, #page-6, #page-7, #page-8 { 
+                page-break-before: always;
+            }
+            .navigation-buttons, #main-header { display: none !important; } 
+            footer { margin-top: 20px; padding-top: 10px; border-top: 1px solid #ccc; }
+            .footer-banner { max-width: 80% !important; max-height: 35px !important; } 
+            svg { max-width: 100% !important; height: auto !important; background-color: #f8fafc !important; }
+            .bar { fill: var(--theme-color-primary) !important; }
+            .line { stroke: var(--theme-color-secondary) !important; }
+            .dot { fill: var(--theme-color-secondary) !important; stroke: #fff !important; }
+            .scatter-dot { fill: var(--theme-color-accent) !important; }
+            pre[class*="language-"] { background-color: #f3f4f6 !important; border: 1px solid #ccc !important; color: #1f2937 !important; }
+            .token.keyword { color: #0077aa !important; }
+            .token.function { color: #dd4a68 !important; }
+            .token.string { color: #690 !important; }
+            .token.number { color: #905 !important; }
+            .token.operator { color: #a67f59 !important; }
+            .token.punctuation { color: #999 !important; }
+            .token.comment { color: slategray !important; }
         }
     </style>
 </head>
-<body>
-    <h1>Test Interview Page</h1>
+<body class="bg-slate-50 text-slate-800 p-4 md:p-8">
+
+    <div class="main-container"> 
+        <header id="main-header" class="mb-8 p-6 bg-white shadow-lg rounded-lg"> 
+            <h1 class="text-2xl font-bold text-center header-main-title">Candidate Test</h1>
+            <p class="mt-2 text-center text-slate-600">
+                Welcome to the technical test. Please review the provided information carefully.
+                Your interviewer will guide you through the questions for each section. Use the "Next" and "Previous" buttons to navigate.
+            </p>
+        </header>
+
+        <!-- Page 0: Introduction and Sample Data Overview -->
+        <div id="page-0" class="test-page section-container shadow-md">
+            <h2 class="section-title">Introduction & Sample Data Overview</h2>
+            <p class="mb-4">This test consists of two parts: SQL query interpretation and chart analysis. You will be presented with SQL queries and charts one at a time. The necessary data structures will be described by your interviewer.</p>
+
+            <h4 class="text-lg font-semibold mt-6 mb-2 text-slate-700">Data Structures Overview</h4>
+            <div class="overflow-x-auto mb-4 p-4 bg-slate-50 rounded-md">
+                <p class="data-placeholder-text">Data Table Placeholder 1</p>
+            </div>
+
+            <div class="overflow-x-auto mt-6 p-4 bg-slate-50 rounded-md">
+                 <p class="data-placeholder-text">Data Table Placeholder 2</p>
+            </div>
+            <p class="mt-6 text-sm text-slate-500">Note: Focus on the general concepts and logic as presented by your interviewer.</p>
+        </div>
+
+        <!-- Page 1: SQL Question 1 -->
+        <div id="page-1" class="test-page section-container shadow-md">
+            <h2 class="section-title">SQL Test - Question 1</h2>
+             <div class="query-block">
+                <h3>SQL Query 1</h3>
+                <p>Please review the following SQL query structure:</p>
+                <pre><code class="language-sql">[SQL Query 1 Redacted - Focus on the logic and clauses described by your interviewer.]</code></pre>
+                 <p class="mt-4">Your interviewer will ask you questions about a specific SQL query.</p>
+            </div>
+        </div>
+
+        <!-- Page 2: SQL Question 2 -->
+        <div id="page-2" class="test-page section-container shadow-md">
+            <h2 class="section-title">SQL Test - Question 2</h2> 
+            <div class="query-block">
+                <h3>SQL Query 2</h3>
+                <p>Please review the following SQL query structure:</p>
+                <pre><code class="language-sql">[SQL Query 2 Redacted - Focus on the logic and clauses described by your interviewer.]</code></pre>
+                <p class="mt-4">Your interviewer will ask you questions about a specific SQL query.</p>
+            </div>
+        </div>
+        
+        <!-- Page 3: SQL Question 3 -->
+        <div id="page-3" class="test-page section-container shadow-md">
+            <h2 class="section-title">SQL Test - Question 3</h2> 
+            <div class="query-block">
+                <h3>SQL Query 3</h3>
+                <p>The following SQL query structure is intended to achieve a certain result but may contain an error. Please review it:</p>
+                <pre><code class="language-sql">[SQL Query 3 (Potentially with an error) Redacted - Focus on the logic and potential issues described by your interviewer.]</code></pre>
+                <p class="mt-4">Your interviewer will ask you questions about this query.</p>
+            </div>
+        </div>
+
+        <!-- Page 4: Transition to Chart Section -->
+        <div id="page-4" class="test-page section-container shadow-md">
+            <h2 class="section-title">Chart Interpretation Section</h2>
+            <p class="text-center text-lg mt-4">You have completed the SQL portion of the test.</p>
+            <p class="text-center text-lg mt-2">The next section will focus on chart interpretation.</p>
+            <p class="text-center mt-6">Please click "Next" when you are ready to proceed.</p>
+        </div>
+
+        <!-- Page 5: Chart 1 -->
+        <div id="page-5" class="test-page chart-container-wrapper"> 
+            <h2 class="chart-title">Chart 1: [Generic Chart Title 1]</h2>
+            <div id="chart1" class="border rounded-md overflow-hidden min-h-[350px] flex justify-center items-center text-slate-400">
+                Chart will be displayed here.
+            </div>
+            <p class="mt-4 text-center">Your interviewer will ask you questions about this chart.</p>
+        </div>
+
+        <!-- Page 6: Chart 2 -->
+        <div id="page-6" class="test-page chart-container-wrapper">
+            <h2 class="chart-title">Chart 2: [Generic Chart Title 2]</h2>
+            <div id="chart2" class="border rounded-md overflow-hidden min-h-[350px] flex justify-center items-center text-slate-400">
+                 Chart will be displayed here.
+            </div>
+            <p class="mt-4 text-center">Your interviewer will ask you questions about this chart.</p>
+        </div>
+
+        <!-- Page 7: Chart 3 -->
+        <div id="page-7" class="test-page chart-container-wrapper">
+            <h2 class="chart-title">Chart 3: [Generic Chart Title 3]</h2>
+            <div id="chart3" class="border rounded-md overflow-hidden min-h-[350px] flex justify-center items-center text-slate-400">
+                 Chart will be displayed here.
+            </div>
+            <p class="mt-4 text-center">Your interviewer will ask you questions about this chart.</p>
+        </div>
+        
+        <!-- Page 8: End of Test -->
+        <div id="page-8" class="test-page section-container shadow-md">
+            <h2 class="section-title">End of Test</h2>
+            <p class="text-center">You have reached the end of the technical test. Thank you!</p>
+        </div>
+
+
+        <div class="navigation-buttons">
+            <button id="prev-button" class="nav-button" onclick="navigatePage(-1)">Previous</button>
+            <button id="next-button" class="nav-button" onclick="navigatePage(1)">Next</button>
+        </div>
+        
+        <footer class="mt-12 mb-8 text-center text-sm text-slate-500">
+            <!-- Copyright text removed -->
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+
+    <script>
+        // Common D3 setup
+        const margin = {top: 40, right: 30, bottom: 60, left: 60};
+        const svgWidth = 700; // Target width for the SVG container
+        const svgHeight = 400; // Target height for the SVG container
+        const width = svgWidth - margin.left - margin.right; 
+        const height = svgHeight - margin.top - margin.bottom;
+        const tooltip = d3.select("body").append("div").attr("class", "tooltip");
+
+        function drawPlaceholderChart(containerId, chartTitleText) {
+            const chartContainer = d3.select(containerId);
+            if (chartContainer.select("svg").empty()) { 
+                chartContainer.html(''); 
+                const svg = chartContainer.append("svg")
+                    .attr("width", svgWidth)
+                    .attr("height", svgHeight)
+                    .append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                const placeholderData = [
+                    { x: 10, y: 20 }, { x: 20, y: 50 }, { x: 30, y: 30 }, { x: 40, y: 60 }, { x: 50, y: 40 }
+                ];
+
+                const x = d3.scaleLinear()
+                    .domain([0, d3.max(placeholderData, d => d.x) * 1.1 || 50]) 
+                    .range([0, width]);
+                svg.append("g")
+                    .attr("transform", `translate(0,${height})`)
+                    .call(d3.axisBottom(x).ticks(5));
+
+                const y = d3.scaleLinear()
+                    .domain([0, d3.max(placeholderData, d => d.y) * 1.1 || 60]) 
+                    .range([height, 0]);
+                svg.append("g")
+                    .call(d3.axisLeft(y).ticks(5));
+                
+                svg.selectAll(".placeholder-dot")
+                    .data(placeholderData)
+                    .enter()
+                    .append("circle")
+                    .attr("class", "scatter-dot placeholder-dot") 
+                    .attr("cx", d => x(d.x))
+                    .attr("cy", d => y(d.y))
+                    .attr("r", 4);
+
+                svg.append("text").attr("class", "axis-label").attr("text-anchor", "middle").attr("x", width / 2).attr("y", height + margin.bottom - 15).text("X-Axis Placeholder");
+                svg.append("text").attr("class", "axis-label").attr("text-anchor", "middle").attr("transform", "rotate(-90)").attr("y", -margin.left + 15).attr("x", -height / 2).text("Y-Axis Placeholder");
+            }
+        }
+
+        // --- Page Navigation Logic ---
+        let currentPageIndex = 0;
+        const pages = document.querySelectorAll('.test-page');
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+        const mainHeader = document.getElementById('main-header'); 
+
+        function showPage(index) {
+            pages.forEach((page, i) => {
+                page.style.display = i === index ? 'block' : 'none';
+            });
+
+            if (mainHeader) {
+                mainHeader.style.display = index === 0 ? 'block' : 'none';
+            }
+
+            if (pages[index].id === 'page-1' || pages[index].id === 'page-2' || pages[index].id === 'page-3') { 
+                if (typeof Prism !== 'undefined') { 
+                    Prism.highlightAllUnder(pages[index]); 
+                }
+            }
+            
+            if (pages[index].id === 'page-5') drawPlaceholderChart("#chart1", "Data Distribution Placeholder"); 
+            if (pages[index].id === 'page-6') drawPlaceholderChart("#chart2", "Trend Over Time Placeholder"); 
+            if (pages[index].id === 'page-7') drawPlaceholderChart("#chart3", "Relationship Placeholder"); 
+
+            prevButton.disabled = index === 0;
+            nextButton.disabled = index === pages.length - 1;
+            window.scrollTo(0,0); 
+        }
+
+        function navigatePage(direction) {
+            const newIndex = currentPageIndex + direction;
+            if (newIndex >= 0 && newIndex < pages.length) {
+                currentPageIndex = newIndex;
+                showPage(currentPageIndex);
+            }
+        }
+        
+        window.onload = function() {
+            showPage(currentPageIndex); 
+            if (pages[currentPageIndex] && (pages[currentPageIndex].id === 'page-1' || pages[currentPageIndex].id === 'page-2' || pages[currentPageIndex].id === 'page-3')) {
+                 if (typeof Prism !== 'undefined') { 
+                    Prism.highlightAllUnder(pages[currentPageIndex]); 
+                }
+            }
+        };
+    </script>
 </body>
 </html>
- 
